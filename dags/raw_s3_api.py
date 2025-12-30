@@ -1,5 +1,4 @@
 import logging
-
 import duckdb
 import pendulum
 from airflow import DAG
@@ -13,22 +12,22 @@ DAG_ID = "raw_s3_api"
 
 # Используемые таблицы в DAG
 LAYER = "raw"
-SOURCE = "earthquake"
+SOURCE = "ecommerce"
 
 # S3
 ACCESS_KEY = Variable.get("access_key")
 SECRET_KEY = Variable.get("secret_key")
 
 LONG_DESCRIPTION = """
-# LONG DESCRIPTION
+# E-commerce data pipeline
 """
 
-SHORT_DESCRIPTION = "SHORT DESCRIPTION"
+SHORT_DESCRIPTION = "Load e-commerce products from DummyJSON to S3"
 
 args = {
     "owner": OWNER,
-    "start_date": pendulum.datetime(2025, 12, 1, tz="Europe/Moscow"),
-    "catchup": True,
+    "start_date": pendulum.datetime(2025, 12, 25, tz="Europe/Moscow"),
+    "catchup": False,
     "retries": 3,
     "retry_delay": pendulum.duration(hours=1),
 }
@@ -44,11 +43,10 @@ def get_dates(**context) -> tuple[str, str]:
 
 def get_and_transfer_api_data_to_s3(**context):
     """"""
-
     start_date, end_date = get_dates(**context)
-    logging.info(f"💻 Start load for dates: {start_date}/{end_date}")
-    con = duckdb.connect()
+    logging.info(f"💻 Start e-commerce data load for: {start_date}/{end_date}")
 
+    con = duckdb.connect()
     con.sql(
         f"""
         SET TIMEZONE='UTC';
@@ -62,17 +60,14 @@ def get_and_transfer_api_data_to_s3(**context):
 
         COPY
         (
-            SELECT
-                *
-            FROM
-                read_csv_auto('https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime={start_date}&endtime={end_date}') AS res
+            SELECT *
+            FROM read_json_auto('https://dummyjson.com/products?limit=100')
         ) TO 's3://supfun/{LAYER}/{SOURCE}/{start_date}/{start_date}_00-00-00.gz.parquet';
-
         """,
     )
 
     con.close()
-    logging.info(f"✅ Download for date success: {start_date}")
+    logging.info(f"✅ E-commerce data loaded: {start_date}")
 
 
 with DAG(
