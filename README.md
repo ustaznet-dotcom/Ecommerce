@@ -2,6 +2,9 @@
 
 # 📦 E-commerce Data Pipeline (Airflow + DuckDB + Postgres)
 
+![Architecture Diagram](images/E-commerce Data.png)
+
+
 ## 🎯 Задача проекта
 Построить надёжный end-to-end data pipeline для загрузки, обработки и аналитики e-commerce данных.
 
