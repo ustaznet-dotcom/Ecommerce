@@ -46,6 +46,8 @@ def get_and_transfer_api_data_to_s3(**context):
     start_date, end_date = get_dates(**context)
     logging.info(f"💻 Start e-commerce data load for: {start_date}/{end_date}")
 
+# 1. Подключаемся к DuckDB #RAW
+
     con = duckdb.connect()
     con.sql(
         f"""

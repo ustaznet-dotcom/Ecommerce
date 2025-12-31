@@ -210,4 +210,4 @@ __marimo__/
 data/
 logs/
 cred.py
-**/.minio.sys/
+#**/.minio.sys/

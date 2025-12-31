@@ -4,17 +4,19 @@ from airflow.operators.empty import EmptyOperator
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from airflow.sensors.external_task import ExternalTaskSensor
 
+
 # Конфигурация DAG
 OWNER = "umar"
 DAG_ID = "FCT_dm_ecommerce"
 
 # Конфигурация таблиц
-LAYER = "raw"  # Слой, откуда берем данные
-SOURCE = "ecommerce"  # Источник данных
-SOURCE_SCHEMA = "ods"  # Откуда берем данные
+LAYER = "raw"                     # Слой, откуда берем данные
+SOURCE = "ecommerce"              # Источник данных
+SOURCE_SCHEMA = "ods"             # Откуда берем данные
 SOURCE_TABLE = "fct_products"
+
 TARGET_SCHEMA = "dm"  # Куда сохраняем витрины
-TARGET_TABLE = "fct_ecommerce"
+TARGET_TABLE = "fct_products_stats"
 
 # DWH подключение
 PG_CONNECT = "postgres_dwh"
@@ -74,34 +76,37 @@ with DAG(
         task_id="create_dm",
         conn_id=PG_CONNECT,
         autocommit=True,
-        sql=f"""
-        -- 1. Создаем таблицу если не существует
-        CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.simple_products (
-            report_date DATE,
-            category TEXT,
-            product_count INTEGER,
-            total_stock INTEGER,
-            avg_price NUMERIC,
-            avg_rating NUMERIC
-        );
+        sql="""
+    CREATE TABLE IF NOT EXISTS {{ params.target_schema }}.{{ params.target_table }} (
+        report_date DATE,
+        category TEXT,
+        product_count INTEGER,
+        total_stock INTEGER,
+        avg_price NUMERIC,
+        avg_rating NUMERIC
+    );
 
-        -- 2. Удаляем данные за сегодня (если уже есть)
-        DELETE FROM {TARGET_SCHEMA}.simple_products
-        WHERE report_date = CURRENT_DATE;
+    DELETE FROM {{ params.target_schema }}.{{ params.target_table }}
+    WHERE report_date = '{{ ds }}';
 
-        -- 3. Вставляем новые данные
-        INSERT INTO {TARGET_SCHEMA}.simple_products
-        SELECT
-            CURRENT_DATE,
-            category,
-            COUNT(*) as product_count,
-            SUM(stock) as total_stock,
-            AVG(price) as avg_price,
-            AVG(rating) as avg_rating
-        FROM {SOURCE_SCHEMA}.{SOURCE_TABLE}
-        GROUP BY category;
-        """,
-    )
+    INSERT INTO {{ params.target_schema }}.{{ params.target_table }}
+    SELECT
+        '{{ ds }}'::DATE,
+        category,
+        COUNT(*),
+        SUM(stock),
+        AVG(price),
+        AVG(rating)
+    FROM {{ params.source_schema }}.{{ params.source_table }}
+    GROUP BY category;
+    """,
+    params={
+        "target_schema": TARGET_SCHEMA,
+        "target_table": TARGET_TABLE,
+        "source_schema": SOURCE_SCHEMA,
+        "source_table": SOURCE_TABLE,
+    },
+)
 
     end = EmptyOperator(task_id="end")
 
