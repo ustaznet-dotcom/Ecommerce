@@ -1,4 +1,6 @@
-```markdown
+#### بسم الله الرحمن الرحيم
+
+
 # 📦 E-commerce Data Pipeline (Airflow + DuckDB + PostgreSQL)
 
 ![Architecture Diagram](images/E_commerce_Data.png)
@@ -87,7 +89,7 @@ dags/
 
 **Example from metabase**
 
-<img src="image/image.png" alt="alt text" width="400" height=200>
+<img src="image/meatabase_image.png" alt="alt text" width="400" height=200>
 
 
 
@@ -175,7 +177,3 @@ AIRFLOW_UID=1000
 - ✅ Локальный Data Lake (MinIO)
 - ✅ Полная оркестрация (Airflow)
 - ✅ Готовность к интеграции с BI
-
-
-```
-![alt text](image.png)
