@@ -1,7 +1,7 @@
 ```markdown
 # 📦 E-commerce Data Pipeline (Airflow + DuckDB + PostgreSQL)
 
-![Architecture Diagram](images/Pic_Ecommerce.png)
+![Architecture Diagram](images/E_commerce_Data.png)
 
 ## 🎯 Задача проекта
 Построить надёжный end-to-end data pipeline для загрузки, обработки и аналитики e-commerce данных.
@@ -84,6 +84,12 @@ dags/
 ## 📊 Аналитическая витрина
 
 **Таблица:** `dm.fct_products_stats`
+
+**Example from metabase**
+
+<img src="image/image.png" alt="alt text" width="400" height=200>
+
+
 
 **Назначение витрины:**
 - Анализ ассортимента
