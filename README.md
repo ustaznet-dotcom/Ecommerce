@@ -89,7 +89,7 @@ dags/
 
 **Example from metabase**
 
-<img src="image/meatabase_image.png" alt="alt text" width="400" height=200>
+<img src="images/metabase_image.png" alt="MetaBase Analytics Dashboard" width="400" height="200">
 
 
 
